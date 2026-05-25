@@ -1,0 +1,16 @@
+if SHIELD_HAILMARY_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "hailmary"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif # SHIELD_HAILMARY_LEFT
+
+if SHIELD_HAILMARY_LEFT || SHIELD_HAILMARY_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+endif # SHIELD_HAILMARY_LEFT || SHIELD_HAILMARY_RIGHT
