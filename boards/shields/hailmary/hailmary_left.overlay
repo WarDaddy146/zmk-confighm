@@ -59,12 +59,12 @@
     };
 
     kscan_right: kscan_right {
-        compatible = "zmk,kscan-gpio-matrix";
-        diode-direction = "col2row";
+    compatible = "zmk,kscan-gpio-matrix";
+    diode-direction = "col2row";
 
-        row-gpios = <&mcp23017_gpio 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
-        col-gpios = <&mcp23017_gpio 5  GPIO_ACTIVE_HIGH>;
-    };
+    row-gpios = <&mcp23017 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+    col-gpios = <&mcp23017 5  GPIO_ACTIVE_HIGH>;
+};
 };
 
 &pinctrl {
@@ -96,11 +96,5 @@
     gpio-controller;
     #gpio-cells = <2>;
     ngpios = <16>;
-    
-    mcp23017_gpio: mcp23017_gpio {
-        compatible = "microchip,mcp230xx-gpio";
-        gpio-controller;
-        #gpio-cells = <2>;
     };
-};
 };
