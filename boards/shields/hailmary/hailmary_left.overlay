@@ -95,12 +95,12 @@
         reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
+        ngpios = <16>;
 
         mcp23017_gpio: gpio {
             compatible = "microchip,mcp230xx-gpio";
             gpio-controller;
             #gpio-cells = <2>;
-            ngpios = <16>;
         };
     };
 };
