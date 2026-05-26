@@ -1,6 +1,6 @@
-if SHIELD_HAILMARY_LEFT
+if SHIELD_HAILMARY
 
 config ZMK_KEYBOARD_NAME
     default "hailmary"
 
-endif # SHIELD_HAILMARY_LEFT
+endif # SHIELD_HAILMARY

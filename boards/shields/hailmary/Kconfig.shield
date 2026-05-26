@@ -1,5 +1,5 @@
 config SHIELD_HAILMARY_LEFT
-    def_bool $(shields_list_contains,hailmary_left)
+    def_bool $(shields_list_contains,hailmary)
 
 config SHIELD_HAILMARY_RIGHT
     def_bool $(shields_list_contains,hailmary_right)
