@@ -66,6 +66,10 @@
 
         row-gpios
             = <&mcp23017 11 GPIO_ACTIVE_LOW>
+            , <&mcp23017 12 GPIO_ACTIVE_LOW>
+            , <&mcp23017 13 GPIO_ACTIVE_LOW>
+            , <&mcp23017 14 GPIO_ACTIVE_LOW>
+            , <&mcp23017 15 GPIO_ACTIVE_LOW>
             ;
 
         col-gpios
