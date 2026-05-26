@@ -63,7 +63,7 @@
     diode-direction = "row2col";
 
     row-gpios = <&mcp23017 10 GPIO_ACTIVE_HIGH>;
-    col-gpios = <&mcp23017 5  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+    col-gpios = <&mcp23017 15  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
 };
 };
 
