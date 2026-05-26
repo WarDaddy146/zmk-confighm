@@ -73,7 +73,12 @@
             ;
 
         col-gpios
-            = <&mcp23017 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            = <&mcp23017 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&mcp23017 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&mcp23017 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&mcp23017 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&mcp23017 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&mcp23017 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
     };
 };
