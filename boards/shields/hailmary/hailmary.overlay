@@ -60,10 +60,10 @@
 
     kscan_right: kscan_right {
     compatible = "zmk,kscan-gpio-matrix";
-    diode-direction = "col2row";
+    diode-direction = "row2col";
 
-    row-gpios = <&mcp23017 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
-    col-gpios = <&mcp23017 5  GPIO_ACTIVE_HIGH>;
+    row-gpios = <&mcp23017 10 GPIO_ACTIVE_HIGH>;
+    col-gpios = <&mcp23017 5  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
 };
 };
 
