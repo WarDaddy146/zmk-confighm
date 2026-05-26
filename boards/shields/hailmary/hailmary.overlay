@@ -1,6 +1,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <dt-bindings/pinctrl/nrf-pinctrl.h>
 
+
 / {
     chosen {
         zmk,kscan = &kscan_composite;
@@ -68,7 +69,7 @@
             ;
 
         col-gpios
-            = <&mcp23017 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            = <&mcp23017 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
     };
 };
