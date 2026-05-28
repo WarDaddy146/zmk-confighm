@@ -10,7 +10,7 @@
             &kp TAB    &kp Q     &kp W     &kp E      &kp R     &kp T       &kp Y     &kp U     &kp I      &kp O     &kp P     &kp LBKT
             &kp LSHFT  &kp A     &kp S     &kp D      &kp F     &kp G       &kp H     &kp J     &kp K      &kp L     &kp SEMI  &kp RSHFT
             &kp LCTRL  &kp Z     &kp X     &kp C      &kp V     &kp B       &kp N     &kp M     &kp COMMA  &kp DOT   &kp FSLH  &kp RCTRL
-            &none      &none     &kp LALT  &kp SPACE  &kp BSPC  &kp RET     &kp RET   &kp MINUS  &kp SPACE  &kp RALT  &none     &none
+            &none      &LALT     &kp LGUI  &kp FN  &kp SPACE  &kp PLUS     &kp RET   &kp MINUS  &kp SPACE  &kp RALT  &none     &none
         >;
         };
     };
