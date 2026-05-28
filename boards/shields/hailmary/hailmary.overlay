@@ -130,5 +130,6 @@
     multiplex-ratio = <31>;
     prechargep = <0x22>;
     status = "okay";
+    ready-time-ms = <100>;
     };
 };
