@@ -1,0 +1,9 @@
+# This file was generated from a template. Edit it to match your keyboard.
+# See https://zmk.dev/docs/development/hardware-integration/new-shield for more
+# instructions.
+
+# This file is used to declare the shield's features and capabilities.
+
+features:
+  - keys
+  - display
