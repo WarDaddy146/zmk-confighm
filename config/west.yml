@@ -1,15 +1,14 @@
 manifest:
+  defaults:
+    revision: main
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+    # Additional modules containing boards/shields/custom code can be listed here as well
+    # See https://docs.zephyrproject.org/3.2.0/develop/west/manifest.html#projects
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main
       import: app/west.yml
-    - name: zmk-config-nice_nano
-      url: https://github.com/nicekeyboards/zmk-config-nice_nano
-      revision: main
-      path: modules/hardware/nice_nano
   self:
     path: config
