@@ -130,5 +130,6 @@
     multiplex-ratio = <31>;
     segment-remap;
     prechargep = <0x22>;
+    zephyr,deferred-init;
 };
 };
