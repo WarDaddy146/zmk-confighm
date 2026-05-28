@@ -33,7 +33,7 @@
 
         right {
             kscan = <&kscan_right>;
-            column-offset = <0>;
+            column-offset = <6>;
         };
     };
 
@@ -61,7 +61,7 @@
 
     kscan_right: kscan_right {
         compatible = "zmk,kscan-gpio-matrix";
-        diode-direction = "row2col";
+        diode-direction = "col2row";
         wakeup-source;
 
         row-gpios
