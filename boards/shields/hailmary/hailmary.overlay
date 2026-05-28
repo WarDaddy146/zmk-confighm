@@ -103,7 +103,7 @@
 };
 
 &i2c1 {
-    compatible = "nordic,nrf-twi";
+    compatible = "nordic,nrf-twim";
     pinctrl-0 = <&i2c1_default>;
     pinctrl-1 = <&i2c1_sleep>;
     pinctrl-names = "default", "sleep";
@@ -130,6 +130,5 @@
     multiplex-ratio = <31>;
     prechargep = <0x22>;
     status = "okay";
-    ready-time-ms = <100>;
     };
 };
