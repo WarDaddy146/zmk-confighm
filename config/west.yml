@@ -2,15 +2,13 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: nicekeyboards
-      url-base: https://github.com/nicekeyboards
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: main
       import: app/west.yml
     - name: zmk-config-nice_nano
-      remote: nicekeyboards
+      url: https://github.com/nicekeyboards/zmk-config-nice_nano
       revision: main
       path: modules/hardware/nice_nano
   self:
