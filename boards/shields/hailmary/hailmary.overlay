@@ -116,4 +116,13 @@
         #gpio-cells = <2>;
         ngpios = <16>;
     };
+
+    ssd1306@3c {
+        compatible = "solomon,ssd1306fb";
+        reg = <0x3c>;
+        width = <128>;
+        height = <32>;
+        multiplex-ratio = <31>;
+        prechargep = <0x22>;
+    };
 };
