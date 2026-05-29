@@ -1,6 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/usb/class/usb_hid.h>
+#include "raw_hid_display.h"
 
 LOG_MODULE_REGISTER(raw_hid);
 
@@ -49,6 +50,9 @@ static void out_ready_cb(const struct device *dev)
   int ret = hid_int_ep_read(dev, buf, sizeof(buf), &len);
   if (ret == 0 && len > 0) {
     LOG_INF("Received %u bytes", len);
+#if IS_ENABLED(CONFIG_ZMK_DISPLAY)
+    raw_hid_display_process(buf, len);
+#endif
   }
 }
 
