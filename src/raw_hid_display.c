@@ -3,15 +3,39 @@
 #include <lvgl.h>
 #include <zmk/display.h>
 #include <zmk/display/status_screen.h>
+#include <zmk/display/widgets/battery_status.h>
+#include <zmk/display/widgets/output_status.h>
+#include <zmk/display/widgets/peripheral_status.h>
+#include <zmk/display/widgets/layer_status.h>
+#include <zmk/display/widgets/wpm_status.h>
 
 LOG_MODULE_REGISTER(raw_hid_display, CONFIG_ZMK_LOG_LEVEL);
 
 #define MAX_LINE_LEN 63
 
-static lv_obj_t *line_label[2];
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_BATTERY_STATUS)
+static struct zmk_widget_battery_status battery_status_widget;
+#endif
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_OUTPUT_STATUS)
+static struct zmk_widget_output_status output_status_widget;
+#endif
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_PERIPHERAL_STATUS)
+static struct zmk_widget_peripheral_status peripheral_status_widget;
+#endif
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_LAYER_STATUS)
+static struct zmk_widget_layer_status layer_status_widget;
+#endif
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_WPM_STATUS)
+static struct zmk_widget_wpm_status wpm_status_widget;
+#endif
+
+static lv_obj_t *hid_label[2];
+static lv_obj_t *widget_containers[5];
+static int widget_count;
 
 struct display_data {
     uint8_t cmd;
+    bool showing_hid;
     char line0[MAX_LINE_LEN + 1];
     char line1[MAX_LINE_LEN + 1];
 };
@@ -23,20 +47,52 @@ static void display_work_handler(struct k_work *work);
 
 K_WORK_DEFINE(display_work, display_work_handler);
 
+static void show_widgets(void)
+{
+    for (int i = 0; i < widget_count; i++) {
+        lv_obj_clear_flag(widget_containers[i], LV_OBJ_FLAG_HIDDEN);
+    }
+    for (int i = 0; i < 2; i++) {
+        lv_obj_add_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+static void show_hid(void)
+{
+    for (int i = 0; i < widget_count; i++) {
+        lv_obj_add_flag(widget_containers[i], LV_OBJ_FLAG_HIDDEN);
+    }
+    for (int i = 0; i < 2; i++) {
+        lv_obj_clear_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
 static void display_work_handler(struct k_work *work)
 {
     k_mutex_lock(&data_mutex, K_FOREVER);
 
     switch (data.cmd) {
     case 0x01:
-        lv_label_set_text(line_label[0], data.line0);
+        lv_label_set_text(hid_label[0], data.line0);
+        if (!data.showing_hid) {
+            data.showing_hid = true;
+            show_hid();
+        }
         break;
     case 0x02:
-        lv_label_set_text(line_label[1], data.line1);
+        lv_label_set_text(hid_label[1], data.line1);
+        if (!data.showing_hid) {
+            data.showing_hid = true;
+            show_hid();
+        }
         break;
     case 0x10:
-        lv_label_set_text(line_label[0], "");
-        lv_label_set_text(line_label[1], "");
+        lv_label_set_text(hid_label[0], "");
+        lv_label_set_text(hid_label[1], "");
+        if (data.showing_hid) {
+            data.showing_hid = false;
+            show_widgets();
+        }
         break;
     }
 
@@ -49,12 +105,53 @@ lv_obj_t *zmk_display_status_screen(void)
     lv_obj_t *screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
 
+    widget_count = 0;
+
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_BATTERY_STATUS)
+    zmk_widget_battery_status_init(&battery_status_widget, screen);
+    widget_containers[widget_count++] =
+        zmk_widget_battery_status_obj(&battery_status_widget);
+    lv_obj_align(zmk_widget_battery_status_obj(&battery_status_widget), LV_ALIGN_TOP_RIGHT, 0, 0);
+#endif
+
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_OUTPUT_STATUS)
+    zmk_widget_output_status_init(&output_status_widget, screen);
+    widget_containers[widget_count++] =
+        zmk_widget_output_status_obj(&output_status_widget);
+    lv_obj_align(zmk_widget_output_status_obj(&output_status_widget), LV_ALIGN_TOP_LEFT, 0, 0);
+#endif
+
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_PERIPHERAL_STATUS)
+    zmk_widget_peripheral_status_init(&peripheral_status_widget, screen);
+    widget_containers[widget_count++] =
+        zmk_widget_peripheral_status_obj(&peripheral_status_widget);
+    lv_obj_align(zmk_widget_peripheral_status_obj(&peripheral_status_widget), LV_ALIGN_TOP_LEFT, 0,
+                 0);
+#endif
+
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_LAYER_STATUS)
+    zmk_widget_layer_status_init(&layer_status_widget, screen);
+    widget_containers[widget_count++] =
+        zmk_widget_layer_status_obj(&layer_status_widget);
+    lv_obj_set_style_text_font(zmk_widget_layer_status_obj(&layer_status_widget),
+                               lv_theme_get_font_small(screen), LV_PART_MAIN);
+    lv_obj_align(zmk_widget_layer_status_obj(&layer_status_widget), LV_ALIGN_BOTTOM_LEFT, 0, 0);
+#endif
+
+#if IS_ENABLED(CONFIG_ZMK_WIDGET_WPM_STATUS)
+    zmk_widget_wpm_status_init(&wpm_status_widget, screen);
+    widget_containers[widget_count++] =
+        zmk_widget_wpm_status_obj(&wpm_status_widget);
+    lv_obj_align(zmk_widget_wpm_status_obj(&wpm_status_widget), LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+#endif
+
     for (int i = 0; i < 2; i++) {
-        line_label[i] = lv_label_create(screen);
-        lv_label_set_text(line_label[i], "");
-        lv_obj_set_style_text_align(line_label[i], LV_TEXT_ALIGN_CENTER, 0);
-        lv_obj_set_style_text_color(line_label[i], lv_color_white(), 0);
-        lv_obj_align(line_label[i], i == 0 ? LV_ALIGN_TOP_MID : LV_ALIGN_BOTTOM_MID, 0, 0);
+        hid_label[i] = lv_label_create(screen);
+        lv_label_set_text(hid_label[i], "");
+        lv_obj_set_style_text_align(hid_label[i], LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_set_style_text_color(hid_label[i], lv_color_white(), 0);
+        lv_obj_align(hid_label[i], i == 0 ? LV_ALIGN_TOP_MID : LV_ALIGN_BOTTOM_MID, 0, 0);
+        lv_obj_add_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
     }
 
     return screen;
