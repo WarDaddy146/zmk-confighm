@@ -1,0 +1,5 @@
+menuconfig RAW_HID
+  bool "Raw HID interface"
+  depends on USB_HID_DEVICE_COUNT >= 2
+  help
+    Enable a vendor-defined raw HID interface alongside the keyboard.

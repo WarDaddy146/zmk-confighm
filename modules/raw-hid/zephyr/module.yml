@@ -1,0 +1,6 @@
+name: zmk-raw-hid
+build:
+  depends:
+    - zmk
+  cmake: .
+  kconfig: Kconfig
