@@ -2,14 +2,6 @@
 #include <dt-bindings/zmk/keys.h>
 
 / {
-    macros {
-        type_fre: type_fre {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&kp F &kp R &kp E>;
-        };
-    };
-
     keymap {
         compatible = "zmk,keymap";
         default_layer {

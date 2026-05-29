@@ -14,25 +14,15 @@ extern void raw_hid_send(const uint8_t *data, uint32_t len);
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event)
 {
-    LOG_INF("rawhidlog behavior pressed, param1=%d, position=%d", binding->param1,
-            event.position);
-
     uint8_t report[64] = {0};
-    report[0] = 0x03; // Command code: type string
-    report[1] = 'f';
-    report[2] = 'r';
-    report[3] = 'e';
-    report[4] = '\0';
+    report[0] = 0x01; // signal: behavior key pressed
     raw_hid_send(report, sizeof(report));
-
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
 static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
                                       struct zmk_behavior_binding_event event)
 {
-    LOG_INF("rawhidlog behavior released, param1=%d, position=%d", binding->param1,
-            event.position);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
