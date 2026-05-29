@@ -135,3 +135,12 @@
     prechargep = <0x22>;
 };
 };
+
+/ {
+    behaviors {
+        raw_hid_log: behavior_raw_hid_log {
+            compatible = "custom,behavior-raw-hid-log";
+            #binding-cells = <1>;
+        };
+    };
+};
