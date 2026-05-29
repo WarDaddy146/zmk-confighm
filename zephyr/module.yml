@@ -1,7 +1,5 @@
 name: zmk-hailmary
 build:
-  depends:
-    - zmk
   cmake: .
   kconfig: Kconfig
   settings:
