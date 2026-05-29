@@ -1,7 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(raw_hid, CONFIG_RAW_HID_LOG_LEVEL);
+LOG_MODULE_REGISTER(raw_hid);
 
 static int raw_hid_init(void)
 {
