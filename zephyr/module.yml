@@ -1,3 +1,10 @@
+name: zmk-hailmary
 build:
+  depends:
+    - zmk
+  cmake: .
+  kconfig: Kconfig
   settings:
     board_root: .
+    dts_root: .
+    snippet_root: .
