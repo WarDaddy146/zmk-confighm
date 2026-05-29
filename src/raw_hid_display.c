@@ -47,11 +47,13 @@ static void display_work_handler(struct k_work *work)
 lv_obj_t *zmk_display_status_screen(void)
 {
     lv_obj_t *screen = lv_obj_create(NULL);
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
 
     for (int i = 0; i < 2; i++) {
         line_label[i] = lv_label_create(screen);
         lv_label_set_text(line_label[i], "");
         lv_obj_set_style_text_align(line_label[i], LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_set_style_text_color(line_label[i], lv_color_white(), 0);
         lv_obj_align(line_label[i], i == 0 ? LV_ALIGN_TOP_MID : LV_ALIGN_BOTTOM_MID, 0, 0);
     }
 
