@@ -134,6 +134,5 @@
     com-sequential;
     inversion-on;
     prechargep = <0x22>;
-    zephyr,deferred-init;
 };
 };
