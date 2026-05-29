@@ -100,49 +100,61 @@ static void display_work_handler(struct k_work *work)
     k_mutex_unlock(&data_mutex);
 }
 
+static void style_widget_container(lv_obj_t *obj)
+{
+    lv_obj_set_style_bg_color(obj, lv_color_black(), 0);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_text_color(obj, lv_color_white(), 0);
+    lv_obj_set_style_pad_all(obj, 0, 0);
+    lv_obj_set_style_border_width(obj, 0, 0);
+}
+
 lv_obj_t *zmk_display_status_screen(void)
 {
     lv_obj_t *screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_obj_set_style_text_color(screen, lv_color_white(), 0);
 
     widget_count = 0;
 
 #if IS_ENABLED(CONFIG_ZMK_WIDGET_BATTERY_STATUS)
     zmk_widget_battery_status_init(&battery_status_widget, screen);
-    widget_containers[widget_count++] =
-        zmk_widget_battery_status_obj(&battery_status_widget);
-    lv_obj_align(zmk_widget_battery_status_obj(&battery_status_widget), LV_ALIGN_TOP_RIGHT, 0, 0);
+    lv_obj_t *bat = zmk_widget_battery_status_obj(&battery_status_widget);
+    style_widget_container(bat);
+    widget_containers[widget_count++] = bat;
+    lv_obj_align(bat, LV_ALIGN_TOP_RIGHT, 0, 0);
 #endif
 
 #if IS_ENABLED(CONFIG_ZMK_WIDGET_OUTPUT_STATUS)
     zmk_widget_output_status_init(&output_status_widget, screen);
-    widget_containers[widget_count++] =
-        zmk_widget_output_status_obj(&output_status_widget);
-    lv_obj_align(zmk_widget_output_status_obj(&output_status_widget), LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_t *out = zmk_widget_output_status_obj(&output_status_widget);
+    style_widget_container(out);
+    widget_containers[widget_count++] = out;
+    lv_obj_align(out, LV_ALIGN_TOP_LEFT, 0, 0);
 #endif
 
 #if IS_ENABLED(CONFIG_ZMK_WIDGET_PERIPHERAL_STATUS)
     zmk_widget_peripheral_status_init(&peripheral_status_widget, screen);
-    widget_containers[widget_count++] =
-        zmk_widget_peripheral_status_obj(&peripheral_status_widget);
-    lv_obj_align(zmk_widget_peripheral_status_obj(&peripheral_status_widget), LV_ALIGN_TOP_LEFT, 0,
-                 0);
+    lv_obj_t *per = zmk_widget_peripheral_status_obj(&peripheral_status_widget);
+    style_widget_container(per);
+    widget_containers[widget_count++] = per;
+    lv_obj_align(per, LV_ALIGN_TOP_LEFT, 0, 0);
 #endif
 
 #if IS_ENABLED(CONFIG_ZMK_WIDGET_LAYER_STATUS)
     zmk_widget_layer_status_init(&layer_status_widget, screen);
-    widget_containers[widget_count++] =
-        zmk_widget_layer_status_obj(&layer_status_widget);
-    lv_obj_set_style_text_font(zmk_widget_layer_status_obj(&layer_status_widget),
-                               lv_theme_get_font_small(screen), LV_PART_MAIN);
-    lv_obj_align(zmk_widget_layer_status_obj(&layer_status_widget), LV_ALIGN_BOTTOM_LEFT, 0, 0);
+    lv_obj_t *lay = zmk_widget_layer_status_obj(&layer_status_widget);
+    style_widget_container(lay);
+    widget_containers[widget_count++] = lay;
+    lv_obj_align(lay, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 #endif
 
 #if IS_ENABLED(CONFIG_ZMK_WIDGET_WPM_STATUS)
     zmk_widget_wpm_status_init(&wpm_status_widget, screen);
-    widget_containers[widget_count++] =
-        zmk_widget_wpm_status_obj(&wpm_status_widget);
-    lv_obj_align(zmk_widget_wpm_status_obj(&wpm_status_widget), LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+    lv_obj_t *wpm = zmk_widget_wpm_status_obj(&wpm_status_widget);
+    style_widget_container(wpm);
+    widget_containers[widget_count++] = wpm;
+    lv_obj_align(wpm, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 #endif
 
     for (int i = 0; i < 2; i++) {
