@@ -1,3 +1,0 @@
-description: Raw HID log test behavior
-compatible: "custom,behavior-raw-hid-log"
-include: one_param.yaml

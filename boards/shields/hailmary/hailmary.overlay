@@ -138,8 +138,8 @@
 
 / {
     behaviors {
-        raw_hid_log: behavior_raw_hid_log {
-            compatible = "custom,behavior-raw-hid-log";
+        rawhidlog: behavior_rawhidlog {
+            compatible = "custom,behavior-rawhidlog";
             #binding-cells = <1>;
         };
     };
