@@ -1,6 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/usb/class/usb_hid.h>
+#include <string.h>
 #include "raw_hid_display.h"
 
 LOG_MODULE_REGISTER(raw_hid);
@@ -32,6 +33,9 @@ static const uint8_t raw_hid_report_desc[] = {
 static const struct device *hid_dev;
 static struct k_sem hid_sem;
 
+static uint8_t rx_buf[64];
+static int rx_offset;
+
 void raw_hid_send(const uint8_t *data, uint32_t len)
 {
   k_sem_take(&hid_sem, K_MSEC(30));
@@ -48,10 +52,19 @@ static void out_ready_cb(const struct device *dev)
   uint8_t buf[64];
   uint32_t len;
   int ret = hid_int_ep_read(dev, buf, sizeof(buf), &len);
-  if (ret == 0 && len > 0) {
-    LOG_INF("Received %u bytes", len);
+  if (ret != 0 || len == 0) return;
+
+  if (rx_offset + len > sizeof(rx_buf)) {
+    len = sizeof(rx_buf) - rx_offset;
+  }
+  memcpy(rx_buf + rx_offset, buf, len);
+  rx_offset += len;
+
+  if (rx_offset >= 64) {
+    rx_offset = 0;
+    LOG_INF("Received 64 bytes");
 #if IS_ENABLED(CONFIG_ZMK_DISPLAY)
-    raw_hid_display_process(buf, len);
+    raw_hid_display_process(rx_buf, 64);
 #endif
   }
 }
