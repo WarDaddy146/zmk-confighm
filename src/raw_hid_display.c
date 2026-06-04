@@ -138,12 +138,12 @@ static void display_work_handler(struct k_work *work)
         break;
     case 0x21:
         convert_frame();
-        lv_obj_invalidate(canvas);
         if (!data.showing_canvas) {
             data.showing_canvas = true;
             data.showing_hid = false;
             show_canvas();
         }
+        lv_obj_invalidate(canvas);
         break;
     case 0x22:
         memset(pixel_buf, 0, sizeof(pixel_buf));
