@@ -2,9 +2,6 @@
 #include <zephyr/logging/log.h>
 #include <lvgl.h>
 
-#ifndef LV_IMG_CF_TRUE_COLOR
-#define LV_IMG_CF_TRUE_COLOR LV_IMG_CF_RAW
-#endif
 
 LOG_MODULE_REGISTER(pixel_demo);
 
@@ -25,7 +22,7 @@ static int pixel_demo_init(void)
         LOG_ERR("Failed to create LVGL canvas");
         return -EINVAL;
     }
-    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, 0);
     lv_canvas_fill_bg(canvas, LV_COLOR_BLACK, LV_OPA_COVER);
 
     /* Draw a single white pixel at (10,10) */
