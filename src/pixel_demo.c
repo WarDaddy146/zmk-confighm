@@ -2,6 +2,10 @@
 #include <zephyr/logging/log.h>
 #include <lvgl.h>
 
+#ifndef LV_IMG_CF_TRUE_COLOR
+#define LV_IMG_CF_TRUE_COLOR LV_IMG_CF_RAW
+#endif
+
 LOG_MODULE_REGISTER(pixel_demo);
 
 /* Buffer for a 1‑bit 128×32 canvas: (128*32)/8 bytes */
