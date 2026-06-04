@@ -36,12 +36,12 @@ static int widget_count;
 static lv_obj_t *canvas;
 static uint8_t canvas_buf[512];
 static uint8_t pixel_buf[512];
-static int pixel_offset;
 
 struct display_data {
     uint8_t cmd;
     bool showing_hid;
     bool showing_canvas;
+    bool in_pixel_frame;
     char line0[MAX_LINE_LEN + 1];
     char line1[MAX_LINE_LEN + 1];
 };
@@ -108,7 +108,10 @@ static void display_work_handler(struct k_work *work)
     case 0x10:
         lv_label_set_text(hid_label[0], "");
         lv_label_set_text(hid_label[1], "");
-        if (data.showing_hid) {
+        if (data.showing_canvas) {
+            data.showing_canvas = false;
+            show_widgets();
+        } else if (data.showing_hid) {
             data.showing_hid = false;
             show_widgets();
         }
@@ -221,32 +224,50 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
 
     k_mutex_lock(&data_mutex, K_FOREVER);
 
-    data.cmd = buf[0];
     uint32_t copy_len = len - 1;
+    uint8_t cmd = buf[0];
+    bool needs_work = false;
 
-    if (data.cmd == 0x01 || data.cmd == 0x02) {
-        char *target = (data.cmd == 0x01) ? data.line0 : data.line1;
-        if (copy_len > MAX_LINE_LEN) {
-            copy_len = MAX_LINE_LEN;
+    if (cmd == 0x00 && !data.in_pixel_frame) {
+        data.in_pixel_frame = true;
+        if (copy_len > 63) copy_len = 63;
+        memcpy(pixel_buf + 1, buf + 1, copy_len);
+    } else if (data.in_pixel_frame && cmd < 8) {
+        if (copy_len > 63) copy_len = 63;
+        memcpy(pixel_buf + cmd * 64 + 1, buf + 1, copy_len);
+    } else if (cmd == 0xFF && data.in_pixel_frame) {
+        data.in_pixel_frame = false;
+        for (int i = 0; i < 8 && i < copy_len; i++) {
+            pixel_buf[i * 64] = buf[1 + i];
         }
+        data.cmd = 0x21;
+        needs_work = true;
+    } else if (cmd == 0x01) {
+        data.in_pixel_frame = false;
+        char *target = data.line0;
+        if (copy_len > MAX_LINE_LEN) copy_len = MAX_LINE_LEN;
         memcpy(target, buf + 1, copy_len);
         target[copy_len] = '\0';
-    } else if (data.cmd == 0x20) {
-        if (pixel_offset + copy_len > sizeof(pixel_buf)) {
-            copy_len = sizeof(pixel_buf) - pixel_offset;
-        }
-        memcpy(pixel_buf + pixel_offset, buf + 1, copy_len);
-        pixel_offset += copy_len;
-    } else if (data.cmd == 0x21) {
-        if (pixel_offset + copy_len > sizeof(pixel_buf)) {
-            copy_len = sizeof(pixel_buf) - pixel_offset;
-        }
-        memcpy(pixel_buf + pixel_offset, buf + 1, copy_len);
-        pixel_offset = 0;
-    } else if (data.cmd == 0x22) {
-        pixel_offset = 0;
+        data.cmd = cmd;
+        needs_work = true;
+    } else if (cmd == 0x02) {
+        data.in_pixel_frame = false;
+        char *target = data.line1;
+        if (copy_len > MAX_LINE_LEN) copy_len = MAX_LINE_LEN;
+        memcpy(target, buf + 1, copy_len);
+        target[copy_len] = '\0';
+        data.cmd = cmd;
+        needs_work = true;
+    } else if (cmd == 0x10) {
+        data.in_pixel_frame = false;
+        memset(pixel_buf, 0, sizeof(pixel_buf));
+        data.cmd = cmd;
+        needs_work = true;
     }
 
     k_mutex_unlock(&data_mutex);
-    k_work_submit_to_queue(zmk_display_work_q(), &display_work);
+
+    if (needs_work) {
+        k_work_submit_to_queue(zmk_display_work_q(), &display_work);
+    }
 }
