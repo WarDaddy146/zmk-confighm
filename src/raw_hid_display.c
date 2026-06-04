@@ -35,10 +35,13 @@ static int widget_count;
 
 static lv_obj_t *canvas;
 static uint8_t canvas_buf[512];
+static uint8_t pixel_buf[512];
+static int pixel_offset;
 
 struct display_data {
     uint8_t cmd;
     bool showing_hid;
+    bool showing_canvas;
     char line0[MAX_LINE_LEN + 1];
     char line1[MAX_LINE_LEN + 1];
 };
@@ -58,6 +61,7 @@ static void show_widgets(void)
     for (int i = 0; i < 2; i++) {
         lv_obj_add_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
     }
+    lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void show_hid(void)
@@ -68,6 +72,18 @@ static void show_hid(void)
     for (int i = 0; i < 2; i++) {
         lv_obj_clear_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
     }
+    lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
+}
+
+static void show_canvas(void)
+{
+    for (int i = 0; i < widget_count; i++) {
+        lv_obj_add_flag(widget_containers[i], LV_OBJ_FLAG_HIDDEN);
+    }
+    for (int i = 0; i < 2; i++) {
+        lv_obj_add_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
+    }
+    lv_obj_clear_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void display_work_handler(struct k_work *work)
@@ -94,6 +110,22 @@ static void display_work_handler(struct k_work *work)
         lv_label_set_text(hid_label[1], "");
         if (data.showing_hid) {
             data.showing_hid = false;
+            show_widgets();
+        }
+        break;
+    case 0x21:
+        memcpy(canvas_buf, pixel_buf, sizeof(pixel_buf));
+        lv_obj_invalidate(canvas);
+        if (!data.showing_canvas) {
+            data.showing_canvas = true;
+            data.showing_hid = false;
+            show_canvas();
+        }
+        break;
+    case 0x22:
+        memset(pixel_buf, 0, sizeof(pixel_buf));
+        if (data.showing_canvas) {
+            data.showing_canvas = false;
             show_widgets();
         }
         break;
@@ -175,6 +207,9 @@ lv_obj_t *zmk_display_status_screen(void)
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
     lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 
+    lv_canvas_set_palette(canvas, 0, (lv_color32_t){.red = 0, .green = 0, .blue = 0, .alpha = 0xFF});
+    lv_canvas_set_palette(canvas, 1, (lv_color32_t){.red = 0xFF, .green = 0xFF, .blue = 0xFF, .alpha = 0xFF});
+
     return screen;
 }
 
@@ -196,6 +231,20 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
         }
         memcpy(target, buf + 1, copy_len);
         target[copy_len] = '\0';
+    } else if (data.cmd == 0x20) {
+        if (pixel_offset + copy_len > sizeof(pixel_buf)) {
+            copy_len = sizeof(pixel_buf) - pixel_offset;
+        }
+        memcpy(pixel_buf + pixel_offset, buf + 1, copy_len);
+        pixel_offset += copy_len;
+    } else if (data.cmd == 0x21) {
+        if (pixel_offset + copy_len > sizeof(pixel_buf)) {
+            copy_len = sizeof(pixel_buf) - pixel_offset;
+        }
+        memcpy(pixel_buf + pixel_offset, buf + 1, copy_len);
+        pixel_offset = 0;
+    } else if (data.cmd == 0x22) {
+        pixel_offset = 0;
     }
 
     k_mutex_unlock(&data_mutex);
