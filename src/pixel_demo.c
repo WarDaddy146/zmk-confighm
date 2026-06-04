@@ -5,7 +5,7 @@
 LOG_MODULE_REGISTER(pixel_demo);
 
 /* Buffer for a 1‑bit 128×32 canvas: (128*32)/8 bytes */
-static uint8_t canvas_buf[512];
+static uint8_t canvas_buf[16384];
 
 static int pixel_demo_init(void)
 {
@@ -21,7 +21,7 @@ static int pixel_demo_init(void)
         LOG_ERR("Failed to create LVGL canvas");
         return -EINVAL;
     }
-    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_IMG_CF_INDEXED_1BIT);
+    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(canvas, LV_COLOR_BLACK, LV_OPA_COVER);
 
     /* Draw a single white pixel at (10,10) */
