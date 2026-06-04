@@ -33,6 +33,9 @@ static lv_obj_t *hid_label[2];
 static lv_obj_t *widget_containers[5];
 static int widget_count;
 
+static lv_obj_t *canvas;
+static uint8_t canvas_buf[512];
+
 struct display_data {
     uint8_t cmd;
     bool showing_hid;
@@ -165,6 +168,14 @@ lv_obj_t *zmk_display_status_screen(void)
         lv_obj_align(hid_label[i], i == 0 ? LV_ALIGN_TOP_MID : LV_ALIGN_BOTTOM_MID, 0, 0);
         lv_obj_add_flag(hid_label[i], LV_OBJ_FLAG_HIDDEN);
     }
+
+    canvas = lv_canvas_create(screen);
+    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_COLOR_FORMAT_I1);
+    lv_obj_set_size(canvas, 128, 32);
+    lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_canvas_set_palette(canvas, 0, (lv_color32_t){.full = 0xFF000000});
+    lv_canvas_set_palette(canvas, 1, (lv_color32_t){.full = 0xFFFFFFFF});
+    lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 
     return screen;
 }
