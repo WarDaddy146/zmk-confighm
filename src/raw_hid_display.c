@@ -244,8 +244,6 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
 
     k_mutex_lock(&data_mutex, K_FOREVER);
 
-    LOG_INF("raw_hid: cmd=0x%02x len=%u", buf[0], len);
-
     uint32_t copy_len = len - 1;
     uint8_t cmd = buf[0];
     bool needs_work = false;
