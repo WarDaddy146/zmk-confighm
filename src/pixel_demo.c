@@ -1,6 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <lvgl.h>
+/* rebuild trigger */
 
 
 LOG_MODULE_REGISTER(pixel_demo);
