@@ -241,32 +241,20 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
     if (!zmk_display_is_initialized() || len < 1) {
         return;
     }
- 
+
     k_mutex_lock(&data_mutex, K_FOREVER);
- 
+
     uint8_t cmd = buf[0];
-    /* 63 bytes of payload per packet (buf[1..63]) */
     uint32_t copy_len = len - 1;
     if (copy_len > 63) copy_len = 63;
- 
+
     bool needs_work = false;
- 
-    if (cmd <= 0x07) {
-        /*
-         * Packets 0x00–0x07: sequential 63-byte chunks covering pixel_buf[0..503].
-         * pixel_buf layout (expected by convert_frame):
-         *   pixel_buf[page * 128 + col], 4 pages x 128 cols = 512 bytes
-         * Chunk mapping:
-         *   pkt 0 -> pixel_buf[0..62]
-         *   pkt 1 -> pixel_buf[63..125]
-         *   ...
-         *   pkt 7 -> pixel_buf[441..503]
-         * Last 8 bytes (pixel_buf[504..511]) are zeroed on init; extend if needed.
-         */
-        memcpy(pixel_buf + cmd * 63, buf + 1, copy_len);
- 
-        if (cmd == 0x07) {
-            /* All 8 packets received — trigger render */
+
+    if (cmd >= 0x30 && cmd <= 0x37) {
+        /* Pixel packets: cmd 0x30–0x37, 63 bytes payload each, covers pixel_buf[0..503] */
+        uint8_t pkt = cmd - 0x30;
+        memcpy(pixel_buf + pkt * 63, buf + 1, copy_len);
+        if (cmd == 0x37) {
             data.cmd = 0x21;
             data.showing_hid = false;
             needs_work = true;
@@ -290,9 +278,9 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
         data.cmd = cmd;
         needs_work = true;
     }
- 
+
     k_mutex_unlock(&data_mutex);
- 
+
     if (needs_work) {
         k_work_submit_to_queue(zmk_display_work_q(), &display_work);
     }
