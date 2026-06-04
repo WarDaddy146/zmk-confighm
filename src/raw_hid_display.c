@@ -173,8 +173,6 @@ lv_obj_t *zmk_display_status_screen(void)
     lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_COLOR_FORMAT_I1);
     lv_obj_set_size(canvas, 128, 32);
     lv_obj_align(canvas, LV_ALIGN_TOP_LEFT, 0, 0);
-    lv_canvas_set_palette(canvas, 0, (lv_color32_t){.full = 0xFF000000});
-    lv_canvas_set_palette(canvas, 1, (lv_color32_t){.full = 0xFFFFFFFF});
     lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 
     return screen;
