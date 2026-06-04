@@ -241,29 +241,37 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
     if (!zmk_display_is_initialized() || len < 1) {
         return;
     }
-
+ 
     k_mutex_lock(&data_mutex, K_FOREVER);
-
-    uint32_t copy_len = len - 1;
+ 
     uint8_t cmd = buf[0];
+    /* 63 bytes of payload per packet (buf[1..63]) */
+    uint32_t copy_len = len - 1;
+    if (copy_len > 63) copy_len = 63;
+ 
     bool needs_work = false;
-
-    if (cmd == 0x00 && !data.in_pixel_frame) {
-        data.in_pixel_frame = true;
-        if (copy_len > 63) copy_len = 63;
-        memcpy(pixel_buf + 1, buf + 1, copy_len);
-    } else if (data.in_pixel_frame && cmd < 8) {
-        if (copy_len > 63) copy_len = 63;
-        memcpy(pixel_buf + cmd * 64 + 1, buf + 1, copy_len);
-    } else if (cmd == 0xFF && data.in_pixel_frame) {
-        data.in_pixel_frame = false;
-        for (int i = 0; i < 8 && i < copy_len; i++) {
-            pixel_buf[i * 64] = buf[1 + i];
+ 
+    if (cmd <= 0x07) {
+        /*
+         * Packets 0x00–0x07: sequential 63-byte chunks covering pixel_buf[0..503].
+         * pixel_buf layout (expected by convert_frame):
+         *   pixel_buf[page * 128 + col], 4 pages x 128 cols = 512 bytes
+         * Chunk mapping:
+         *   pkt 0 -> pixel_buf[0..62]
+         *   pkt 1 -> pixel_buf[63..125]
+         *   ...
+         *   pkt 7 -> pixel_buf[441..503]
+         * Last 8 bytes (pixel_buf[504..511]) are zeroed on init; extend if needed.
+         */
+        memcpy(pixel_buf + cmd * 63, buf + 1, copy_len);
+ 
+        if (cmd == 0x07) {
+            /* All 8 packets received — trigger render */
+            data.cmd = 0x21;
+            data.showing_hid = false;
+            needs_work = true;
         }
-        data.cmd = 0x21;
-        needs_work = true;
     } else if (cmd == 0x01) {
-        data.in_pixel_frame = false;
         char *target = data.line0;
         if (copy_len > MAX_LINE_LEN) copy_len = MAX_LINE_LEN;
         memcpy(target, buf + 1, copy_len);
@@ -271,7 +279,6 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
         data.cmd = cmd;
         needs_work = true;
     } else if (cmd == 0x02) {
-        data.in_pixel_frame = false;
         char *target = data.line1;
         if (copy_len > MAX_LINE_LEN) copy_len = MAX_LINE_LEN;
         memcpy(target, buf + 1, copy_len);
@@ -279,14 +286,13 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
         data.cmd = cmd;
         needs_work = true;
     } else if (cmd == 0x10) {
-        data.in_pixel_frame = false;
         memset(pixel_buf, 0, sizeof(pixel_buf));
         data.cmd = cmd;
         needs_work = true;
     }
-
+ 
     k_mutex_unlock(&data_mutex);
-
+ 
     if (needs_work) {
         k_work_submit_to_queue(zmk_display_work_q(), &display_work);
     }
