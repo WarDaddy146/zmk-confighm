@@ -27,7 +27,7 @@ static int pixel_demo_init(void)
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
 
     /* Draw a single white pixel at (10,10) */
-    lv_canvas_set_px(canvas, 10, 10, LV_COLOR_WHITE);
+    lv_canvas_set_px(canvas, 10, 10, lv_color_white());
 
     /* Force a refresh of the canvas */
     lv_obj_invalidate(canvas);
