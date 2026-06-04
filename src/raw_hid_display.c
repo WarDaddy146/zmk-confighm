@@ -86,6 +86,26 @@ static void show_canvas(void)
     lv_obj_clear_flag(canvas, LV_OBJ_FLAG_HIDDEN);
 }
 
+static void convert_frame(void)
+{
+    memset(canvas_buf, 0, sizeof(canvas_buf));
+    for (int page = 0; page < 4; page++) {
+        for (int col = 0; col < 128; col++) {
+            uint8_t ssd = pixel_buf[page * 128 + col];
+            if (ssd == 0) continue;
+            int dst_byte = col >> 3;
+            int dst_bit = 7 - (col & 7);
+            uint8_t mask = 1 << dst_bit;
+            for (int b = 0; b < 8; b++) {
+                if (ssd & (1 << b)) {
+                    int row = page * 8 + b;
+                    canvas_buf[row * 16 + dst_byte] |= mask;
+                }
+            }
+        }
+    }
+}
+
 static void display_work_handler(struct k_work *work)
 {
     k_mutex_lock(&data_mutex, K_FOREVER);
@@ -117,7 +137,7 @@ static void display_work_handler(struct k_work *work)
         }
         break;
     case 0x21:
-        memcpy(canvas_buf, pixel_buf, sizeof(pixel_buf));
+        convert_frame();
         lv_obj_invalidate(canvas);
         if (!data.showing_canvas) {
             data.showing_canvas = true;
@@ -223,6 +243,8 @@ void raw_hid_display_process(const uint8_t *buf, uint32_t len)
     }
 
     k_mutex_lock(&data_mutex, K_FOREVER);
+
+    LOG_INF("raw_hid: cmd=0x%02x len=%u", buf[0], len);
 
     uint32_t copy_len = len - 1;
     uint8_t cmd = buf[0];
