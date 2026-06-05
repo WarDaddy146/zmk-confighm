@@ -33,12 +33,12 @@ static int lvgl_pixel_init(const struct device *dev)
     disp_drv.flush_cb = dummy_flush;
     disp_drv.draw_buf = &draw_buf;
     disp_drv.hor_res = 128;
-    disp_drv.ver_res = 64;
+    disp_drv.ver_res = 32;
     (void)lv_disp_drv_register(&disp_drv);
 
-    static lv_color_t canvas_buf[128 * 64];
+    static lv_color_t canvas_buf[128 * 32];
     lv_obj_t *canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, canvas_buf, 128, 64, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, canvas_buf, 128, 32, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
     lv_canvas_set_px(canvas, 10, 10, lv_color_white());
 
