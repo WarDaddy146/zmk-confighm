@@ -11,6 +11,6 @@ lv_obj_t *zmk_display_status_screen(void)
     memset(cbuf, 0xFF, sizeof(cbuf));
     lv_canvas_set_buffer(canvas, cbuf, 128, 32, LV_COLOR_FORMAT_L8);
     lv_obj_set_pos(canvas, 0, 0);
-    cbuf[127 * 128 + 31]   = 0x00;
+    cbuf[31 * 128 + 127]   = 0x00;
     return screen;
 }
