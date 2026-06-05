@@ -1,15 +1,17 @@
 #include <lvgl.h>
 
-static lv_color_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(128, 32)];
-
 lv_obj_t *zmk_display_status_screen(void)
 {
     lv_obj_t *screen = lv_obj_create(NULL);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), LV_PART_MAIN);
 
-    lv_obj_t *canvas = lv_canvas_create(screen);
-    lv_canvas_set_buffer(canvas, cbuf, 128, 32, LV_IMG_CF_TRUE_COLOR);
-    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
-    lv_canvas_set_px(canvas, 0, 0, lv_color_black(), LV_OPA_COVER);
+    lv_obj_t *pixel = lv_obj_create(screen);
+    lv_obj_set_size(pixel, 1, 1);
+    lv_obj_set_pos(pixel, 0, 0);
+    lv_obj_set_style_bg_color(pixel, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(pixel, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(pixel, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(pixel, 0, LV_PART_MAIN);
 
     return screen;
 }
