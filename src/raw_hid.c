@@ -2,7 +2,6 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/usb/class/usb_hid.h>
 #include <string.h>
-#include "raw_hid_display.h"
 
 LOG_MODULE_REGISTER(raw_hid);
 
@@ -63,9 +62,6 @@ static void out_ready_cb(const struct device *dev)
   if (rx_offset >= 64) {
     rx_offset = 0;
     LOG_INF("Received 64 bytes");
-#if IS_ENABLED(CONFIG_ZMK_DISPLAY)
-    raw_hid_display_process(rx_buf, 64);
-#endif
   }
 }
 
