@@ -3,8 +3,8 @@
  * It creates a canvas, clears it black and lights a single white pixel.
  */
 
-#include <zephyr.h>
-#include <logging/log.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <lvgl.h>
 
 LOG_MODULE_REGISTER(lvgl_pixel, LOG_LEVEL_INF);
