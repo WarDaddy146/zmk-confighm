@@ -8,10 +8,12 @@ lv_obj_t *zmk_display_status_screen(void)
     lv_obj_t *canvas = lv_canvas_create(screen);
     static uint8_t cbuf[128 * 32];
 
-    memset(cbuf, 0x00, sizeof(cbuf));
+    memset(cbuf, 0xFF, sizeof(cbuf));
     lv_canvas_set_buffer(canvas, cbuf, 128, 32, LV_COLOR_FORMAT_L8);
     lv_obj_set_pos(canvas, 0, 0);
-    cbuf[0 * 128 + 0]   = 0xFF;
-
+    cbuf[0 * 128 + 0]   = 0x00;
+    cbuf[127 * 128 + 0]   = 0x00;
+    cbuf[0 * 128 + 31]   = 0x00;
+    cbuf[127 * 128 + 31]   = 0x00;
     return screen;
 }
