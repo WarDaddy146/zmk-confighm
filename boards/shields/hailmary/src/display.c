@@ -9,7 +9,7 @@ lv_obj_t *zmk_display_status_screen(void)
     static uint8_t cbuf[16];
     lv_canvas_set_buffer(canvas, cbuf, 1, 1, LV_COLOR_FORMAT_L8);
     lv_obj_set_pos(canvas, 0, 0);
-    lv_canvas_set_px(canvas, 0, 0, lv_color_black());
+    lv_canvas_set_px(canvas, 0, 0, lv_color_black(), LV_OPA_COVER);
 
     return screen;
 }
