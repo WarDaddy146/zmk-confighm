@@ -15,5 +15,6 @@ lv_obj_t *zmk_display_status_screen(void)
     cbuf[31 * 128 + 127]   = 0x00;
     cbuf[0 * 128 + 127]   = 0x00;
     cbuf[31 * 128 + 0]   = 0x00;
+    cbuf[15 * 128 + 63]   = 0x00;
     return screen;
 }
