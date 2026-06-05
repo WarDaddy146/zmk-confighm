@@ -7,7 +7,7 @@ endif()
 
 # Add pixel demo when LVGL support is enabled
 if(CONFIG_LVGL)
-  target_sources(app PRIVATE src/pixel_demo.c)
+  target_sources(app PRIVATE src/pixel_demo.c src/lvgl_pixel.c)
 endif()
 
 # raw_hid_display.c is optional; omitted because the source file is unavailable
