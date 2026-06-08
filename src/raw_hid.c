@@ -32,8 +32,10 @@ static const uint8_t raw_hid_report_desc[] = {
 static const struct device *hid_dev;
 static struct k_sem hid_sem;
 
-static uint8_t rx_buf[64];
-static int rx_offset;
+extern uint8_t display_cbuf[4096];
+extern void display_invalidate_canvas(void);
+
+static uint32_t raw_hid_cbuf_offset;
 
 void raw_hid_send(const uint8_t *data, uint32_t len)
 {
@@ -53,15 +55,17 @@ static void out_ready_cb(const struct device *dev)
   int ret = hid_int_ep_read(dev, buf, sizeof(buf), &len);
   if (ret != 0 || len == 0) return;
 
-  if (rx_offset + len > sizeof(rx_buf)) {
-    len = sizeof(rx_buf) - rx_offset;
-  }
-  memcpy(rx_buf + rx_offset, buf, len);
-  rx_offset += len;
+  if (raw_hid_cbuf_offset + len > sizeof(display_cbuf))
+    len = sizeof(display_cbuf) - raw_hid_cbuf_offset;
 
-  if (rx_offset >= 64) {
-    rx_offset = 0;
-    LOG_INF("Received 64 bytes");
+  memcpy(display_cbuf + raw_hid_cbuf_offset, buf, len);
+  LOG_INF("RX packet offset=%u len=%u", raw_hid_cbuf_offset, len);
+  raw_hid_cbuf_offset += len;
+
+  if (raw_hid_cbuf_offset >= sizeof(display_cbuf)) {
+    raw_hid_cbuf_offset = 0;
+    display_invalidate_canvas();
+    LOG_INF("Frame complete");
   }
 }
 
